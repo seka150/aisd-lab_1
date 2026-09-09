@@ -22,4 +22,5 @@ target_compile_features("${PROJECT_NAME}" PUBLIC cxx_std_23)
 target_sources(oop-labs
   PUBLIC
     FILE_SET CXX_MODULES FILES
+      polynomial_class.cppm
 )
