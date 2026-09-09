@@ -2,7 +2,7 @@ module;
 export module polynomial_class;
 import std;
 
-template <typename T, typename U>
+export template <typename T, typename U>
 class Polynomial
 {
 private:
@@ -130,7 +130,7 @@ public:
     }
 };
 
-template <typename T, typename U>
+export template <typename T, typename U>
 Polynomial<T, U> operator*(T scalar, const Polynomial<T, U> &polynomial)
 {
     return polynomial * scalar;
