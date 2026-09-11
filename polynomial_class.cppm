@@ -102,7 +102,7 @@ public:
         return result;
     }
 
-    T evaluate(U x) const
+    T evaluate(U x) const // вычисление значения многочлена при указанном значении х
     {
         T result = 0;
         for (std::size_t i = 0; i < _vec.size(); i++)
@@ -112,7 +112,7 @@ public:
         return result;
     }
 
-    void shrink_to_fit()
+    void shrink_to_fit() // удаление нулей в конце
     {
         while (_vec.size() > 1 && _vec.back() == 0)
         {
