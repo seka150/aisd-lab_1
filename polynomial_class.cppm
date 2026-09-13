@@ -6,26 +6,54 @@ export template <typename T, typename U>
 class Polynomial
 {
 private:
-    std::vector<T> _vec;
+    T *_data;
+    int _size;
 
 public:
-    Polynomial(std::vector<T> vec) : _vec(vec) {}
+    Polynomial(int degree) : _data(new T[degree + 1]{}), _size(degree + 1) {}
 
-    Polynomial(int degree) : _vec(degree + 1, 0) {}
+    ~Polynomial()
+    {
+        delete[] _data;
+    }
+
+    Polynomial(const Polynomial &other) : _data(new T[other._size]), _size(other._size)
+    {
+        for (int i = 0; i < _size; i++)
+        {
+            _data[i] = other._data[i];
+        }
+    }
+
+    Polynomial &operator=(const Polynomial &other)
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+        delete[] _data;
+        _size = other._size;
+        _data = new T[other._size];
+        for (int i = 0; i < _size; i++)
+        {
+            _data[i] = other._data[i];
+        }
+        return *this;
+    }
 
     std::pair<U, U> local_extremum() const
     {
-        if (_vec.size() < 3)
+        if (_size < 3)
         {
             throw std::out_of_range("Polynomial must have at least 3 coefficients");
         }
-        if (_vec[2] == 0)
+        if (_data[2] == 0)
         {
             throw std::invalid_argument("Polynomial must be quadratic");
         }
 
-        U x = -_vec[1] / (2 * _vec[2]);
-        U y = _vec[2] * x * x + _vec[1] * x + _vec[0];
+        U x = -static_cast<U>(_data[1]) / (2 * static_cast<U>(_data[2]));
+        U y = static_cast<U>(_data[2]) * x * x + static_cast<U>(_data[1]) * x + static_cast<U>(_data[0]);
         return std::make_pair(x, y);
     }
 
@@ -35,37 +63,45 @@ public:
         {
             return 0;
         }
-        if (static_cast<std::size_t>(degree) >= _vec.size())
+        if (degree >= _size)
         {
             return 0;
         }
 
-        return _vec[degree];
+        return _data[degree];
     }
 
     void set(int degree, T value)
     {
-        if (degree >= _vec.size())
+        if (degree >= _size)
         {
-            _vec.resize(degree + 1);
+            T *new_data = new T[degree + 1]{};
+            for (int i = 0; i < _size; i++)
+            {
+                new_data[i] = _data[i];
+            }
+            delete[] _data;
+            _data = new_data;
+            _size = degree + 1;
         }
-        _vec[degree] = value;
+        _data[degree] = value;
     }
 
     Polynomial operator+(const Polynomial &other) const
     {
-        std::size_t size;
-        if (_vec.size() > other._vec.size())
+        int new_size;
+        if (_size > other._size)
         {
-            size = _vec.size();
+            new_size = _size;
         }
         else
         {
-            size = other._vec.size();
+            new_size = other._size;
         }
-        Polynomial result(size - 1);
 
-        for (std::size_t i = 0; i < size; i++)
+        Polynomial result(new_size - 1);
+
+        for (int i = 0; i < new_size; i++)
         {
             result.set(i, (*this)[i] + other[i]);
         }
@@ -74,28 +110,29 @@ public:
 
     Polynomial operator-(const Polynomial &other) const
     {
-        std::size_t size;
-        if (_vec.size() > other._vec.size())
+        int new_size;
+        if (_size > other._size)
         {
-            size = _vec.size();
+            new_size = _size;
         }
         else
         {
-            size = other._vec.size();
+            new_size = other._size;
         }
-        Polynomial result(size - 1);
 
-        for (std::size_t i = 0; i < size; i++)
+        Polynomial result(new_size - 1);
+
+        for (int i = 0; i < new_size; i++)
         {
             result.set(i, (*this)[i] - other[i]);
         }
         return result;
     }
 
-    Polynomial operator*(T scalar) const
+    Polynomial operator*(U scalar) const
     {
-        Polynomial result(_vec.size() - 1);
-        for (std::size_t i = 0; i < _vec.size(); i++)
+        Polynomial result(_size - 1);
+        for (int i = 0; i < _size; i++)
         {
             result.set(i, (*this)[i] * scalar);
         }
@@ -105,33 +142,52 @@ public:
     T evaluate(U x) const // вычисление значения многочлена при указанном значении х
     {
         T result = 0;
-        for (std::size_t i = 0; i < _vec.size(); i++)
+        for (int i = 0; i < _size; i++)
         {
-            result += _vec[i] * std::pow(x, i);
+            result += (*this)[i] * std::pow(x, i);
         }
         return result;
     }
 
     void shrink_to_fit() // удаление нулей в конце
     {
-        while (_vec.size() > 1 && _vec.back() == 0)
+        while (_size > 1 && _data[_size - 1] == 0)
         {
-            _vec.pop_back();
+            _size--;
         }
-        _vec.shrink_to_fit();
+        T *new_data = new T[_size];
+        for (int i = 0; i < _size; i++)
+        {
+            new_data[i] = _data[i];
+        }
+        delete[] _data;
+        _data = new_data;
     }
 
     void expand(int degree)
     {
-        if (_vec.size() < degree + 1)
+        int old_size = _size;
+        if (degree + 1 <= old_size)
         {
-            _vec.resize(degree + 1);
+            return;
         }
+
+        if (old_size < degree + 1)
+        {
+            _size = degree + 1;
+        }
+        T *new_data = new T[_size]{};
+        for (int i = 0; i < old_size; i++)
+        {
+            new_data[i] = _data[i];
+        }
+        delete[] _data;
+        _data = new_data;
     }
 };
 
 export template <typename T, typename U>
-Polynomial<T, U> operator*(T scalar, const Polynomial<T, U> &polynomial)
+Polynomial<T, U> operator*(U scalar, const Polynomial<T, U> &polynomial)
 {
     return polynomial * scalar;
 }
