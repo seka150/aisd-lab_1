@@ -1,26 +1,45 @@
 cmake_minimum_required(VERSION 4.1)
 
 set(CMAKE_CXX_MODULE_STD ON)
-set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD d0edc3af-4c50-42ea-a356-e2862fe7a444)
 
-project("oop-labs")
+set(CMAKE_CXX_STDLIB_MODULES_JSON
+    "/opt/homebrew/opt/llvm/lib/c++/libc++.modules.json")
+
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD
+    d0edc3af-4c50-42ea-a356-e2862fe7a444)
+
+project("aisd-labs")
+
+set(CMAKE_OSX_SYSROOT
+    "/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk")
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
    CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Weffc++ -Wextra -Wpedantic")
+
+    set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} -Wall -Weffc++ -Wextra -Wpedantic")
+
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-    string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-  endif()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8 /W4")
+
+    if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+        string(REGEX REPLACE
+            "/W[0-4]"
+            ""
+            CMAKE_CXX_FLAGS
+            "${CMAKE_CXX_FLAGS}")
+    endif()
+
+    set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} /utf-8 /W4")
+
 endif()
 
 add_executable("${PROJECT_NAME}" main.cpp)
 
 target_compile_features("${PROJECT_NAME}" PUBLIC cxx_std_23)
 
-target_sources(oop-labs
-  PUBLIC
-    FILE_SET CXX_MODULES FILES
-      polynomial_class.cppm
+target_sources("${PROJECT_NAME}"
+    PUBLIC
+        FILE_SET CXX_MODULES FILES
+            polynomial_class.cppm
 )
