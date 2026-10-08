@@ -3,7 +3,7 @@ import polynomial_class;
 
 int main()
 {
-    // Constructor from coefficient array
+    // Create a polynomial from an array of coefficients
     double coefficients[] = {3.0, 4.0, 2.0};
     Polynomial<double, double> p(coefficients, 3);
 
@@ -12,45 +12,35 @@ int main()
     // operator[]
     std::cout << "p[0] = " << p[0] << '\n';
     std::cout << "p[1] = " << p[1] << '\n';
-    std::cout << "p[2] = " << p[2] << '\n';
     std::cout << "p[5] = " << p[5] << '\n';
 
-    // set
+    // set and expand
     p.set(3, 5.0);
-    std::cout << "\nAfter set(3, 5.0): " << p << '\n';
+    std::cout << "After set(3, 5.0): " << p << '\n';
 
-    // expand
     p.expand(5);
     std::cout << "After expand(5): " << p << '\n';
 
-    // Second polynomial
+    // Create a second polynomial
     double coefficients2[] = {1.0, 2.0, 3.0};
     Polynomial<double, double> q(coefficients2, 3);
 
     std::cout << "\nPolynomial q: " << q << '\n';
 
-    // Addition
-    Polynomial<double, double> sum = p + q;
-    std::cout << "p + q = " << sum << '\n';
-
-    // Subtraction
-    Polynomial<double, double> difference = p - q;
-    std::cout << "p - q = " << difference << '\n';
+    // Addition and subtraction
+    std::cout << "p + q = " << p + q << '\n';
+    std::cout << "p - q = " << p - q << '\n';
 
     // Scalar multiplication
-    Polynomial<double, double> multiplied1 = p * 2.0;
-    Polynomial<double, double> multiplied2 = 2.0 * p;
-
-    std::cout << "p * 2 = " << multiplied1 << '\n';
-    std::cout << "2 * p = " << multiplied2 << '\n';
+    std::cout << "p * 2 = " << p * 2.0 << '\n';
+    std::cout << "2 * p = " << 2.0 * p << '\n';
 
     // Evaluation
-    double x = 2.0;
-    std::cout << "p(" << x << ") = " << p.evaluate(x) << '\n';
+    std::cout << "p(2) = " << p.evaluate(2.0) << '\n';
 
     // Copy constructor
-    Polynomial<double, double> copy = p;
-    std::cout << "\nCopy of p: " << copy << '\n';
+    Polynomial<double, double> copy(p);
+    std::cout << "Copy of p: " << copy << '\n';
 
     // Assignment operator
     Polynomial<double, double> assigned(0);
@@ -61,10 +51,9 @@ int main()
     std::cout << "p == copy: " << (p == copy) << '\n';
     std::cout << "p != q: " << (p != q) << '\n';
 
-    // Shrink
+    // shrink_to_fit
     p.shrink_to_fit();
     std::cout << "After shrink_to_fit: " << p << '\n';
-    std::cout << "Size: " << p.getSize() << '\n';
 
     // Local extremum
     double quadratic_coefficients[] = {3.0, 4.0, 2.0};
@@ -77,31 +66,13 @@ int main()
               << extremum.first << ", "
               << extremum.second << ")\n";
 
-    // int
+    // Template type checks
     int int_coefficients[] = {1, 2, 3};
     Polynomial<int, int> int_polynomial(int_coefficients, 3);
 
-    std::cout << "\nint polynomial: " << int_polynomial << '\n';
-    std::cout << "int polynomial at 2: "
-              << int_polynomial.evaluate(2) << '\n';
-
-    // float
     float float_coefficients[] = {1.0f, 2.0f, 3.0f};
     Polynomial<float, float> float_polynomial(float_coefficients, 3);
 
-    std::cout << "\nfloat polynomial: " << float_polynomial << '\n';
-    std::cout << "float polynomial at 2.0: "
-              << float_polynomial.evaluate(2.0f) << '\n';
-
-    // double
-    double double_coefficients[] = {1.0, 2.0, 3.0};
-    Polynomial<double, double> double_polynomial(double_coefficients, 3);
-
-    std::cout << "\ndouble polynomial: " << double_polynomial << '\n';
-    std::cout << "double polynomial at 2.0: "
-              << double_polynomial.evaluate(2.0) << '\n';
-
-    // complex<float>
     std::complex<float> complex_float_coefficients[] = {
         {1.0f, 2.0f},
         {3.0f, 4.0f},
@@ -110,10 +81,6 @@ int main()
     Polynomial<std::complex<float>, std::complex<float>>
         complex_float_polynomial(complex_float_coefficients, 3);
 
-    std::cout << "\ncomplex<float> polynomial: "
-              << complex_float_polynomial << '\n';
-
-    // complex<double>
     std::complex<double> complex_double_coefficients[] = {
         {1.0, 2.0},
         {3.0, 4.0},
@@ -122,26 +89,61 @@ int main()
     Polynomial<std::complex<double>, std::complex<double>>
         complex_double_polynomial(complex_double_coefficients, 3);
 
-    std::cout << "\ncomplex<double> polynomial: "
+    std::cout << "\nint polynomial: " << int_polynomial << '\n';
+    std::cout << "int polynomial at 2: "
+              << int_polynomial.evaluate(2) << '\n';
+
+    std::cout << "float polynomial: " << float_polynomial << '\n';
+    std::cout << "float polynomial at 2: "
+              << float_polynomial.evaluate(2.0f) << '\n';
+
+    std::cout << "complex<float> polynomial: "
+              << complex_float_polynomial << '\n';
+
+    std::cout << "complex<double> polynomial: "
               << complex_double_polynomial << '\n';
 
-    std::cout << random_value<int>() << '\n';
-    std::cout << random_value<float>() << '\n';
-    std::cout << random_value<double>() << '\n';
-    std::cout << random_value<std::complex<float>>() << '\n';
-    std::cout << random_value<std::complex<double>>() << '\n';
-
+    // Random polynomial
     auto random_p = random_polynomial<double, double>(5);
+
+    std::cout << "\nRandom polynomial: " << random_p << '\n';
+
+    std::cout << "random_p[0] = " << random_p[0] << '\n';
+    std::cout << "random_p[10] = " << random_p[10] << '\n';
+
     random_p.set(6, 5.0);
+    std::cout << "After set(6, 5.0): " << random_p << '\n';
 
-    std::cout << "Random polynomial: " << random_p << '\n';
-    std::cout << "After set: " << random_p << '\n';
+    random_p.expand(8);
+    std::cout << "After expand(8): " << random_p << '\n';
 
-    auto random_sum = random_p + q;
-    auto random_difference = random_p - q;
+    std::cout << "random_p + q = " << random_p + q << '\n';
+    std::cout << "random_p - q = " << random_p - q << '\n';
+    std::cout << "random_p * 2 = " << random_p * 2.0 << '\n';
+    std::cout << "2 * random_p = " << 2.0 * random_p << '\n';
 
-    std::cout << "Random p + q: " << random_sum << '\n';
-    std::cout << "Random p - q: " << random_difference << '\n';
+    std::cout << "random_p(2) = "
+              << random_p.evaluate(2.0) << '\n';
+
+    Polynomial<double, double> random_copy(random_p);
+    std::cout << "Copy of random_p: "
+              << random_copy << '\n';
+
+    Polynomial<double, double> random_assigned(0);
+    random_assigned = random_p;
+
+    std::cout << "Assigned random_p: "
+              << random_assigned << '\n';
+
+    std::cout << "random_p == random_copy: "
+              << (random_p == random_copy) << '\n';
+
+    std::cout << "random_p != q: "
+              << (random_p != q) << '\n';
+
+    random_p.shrink_to_fit();
+    std::cout << "After shrink_to_fit: "
+              << random_p << '\n';
 
     return 0;
 }
