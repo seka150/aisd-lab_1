@@ -125,5 +125,23 @@ int main()
     std::cout << "\ncomplex<double> polynomial: "
               << complex_double_polynomial << '\n';
 
+    std::cout << random_value<int>() << '\n';
+    std::cout << random_value<float>() << '\n';
+    std::cout << random_value<double>() << '\n';
+    std::cout << random_value<std::complex<float>>() << '\n';
+    std::cout << random_value<std::complex<double>>() << '\n';
+
+    auto random_p = random_polynomial<double, double>(5);
+    random_p.set(6, 5.0);
+
+    std::cout << "Random polynomial: " << random_p << '\n';
+    std::cout << "After set: " << random_p << '\n';
+
+    auto random_sum = random_p + q;
+    auto random_difference = random_p - q;
+
+    std::cout << "Random p + q: " << random_sum << '\n';
+    std::cout << "Random p - q: " << random_difference << '\n';
+
     return 0;
 }

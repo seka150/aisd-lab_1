@@ -8,6 +8,7 @@ class Polynomial
 private:
     T *_data;
     int _size;
+    static inline const double epsilon = 1e-6;
 
 public:
     Polynomial(int degree)
@@ -17,17 +18,17 @@ public:
             throw std::invalid_argument("Degree cannot be negative");
         }
         _size = degree + 1;
-        _data = new T[_size]{};
+        _data = new T[static_cast<std::size_t>(_size)]{};
     }
 
     Polynomial(const T *coeff, int size)
     {
-        if (size <= 0)
+        if (size <= 0 && coeff == nullptr)
         {
-            throw std::out_of_range("size <= 0");
+            throw std::invalid_argument("size <= 0");
         }
         _size = size;
-        _data = new T[size];
+        _data = new T[static_cast<std::size_t>(size)];
         for (int i = 0; i < size; i++)
         {
             _data[i] = coeff[i];
@@ -39,7 +40,7 @@ public:
         delete[] _data;
     }
 
-    Polynomial(const Polynomial &other) : _data(new T[other._size]), _size(other._size)
+    Polynomial(const Polynomial &other) : _data(new T[static_cast<std::size_t>(other._size)]), _size(other._size)
     {
         for (int i = 0; i < _size; i++)
         {
@@ -65,7 +66,7 @@ public:
         }
         delete[] _data;
         _size = other._size;
-        _data = new T[other._size];
+        _data = new T[static_cast<std::size_t>(other._size)];
         for (int i = 0; i < _size; i++)
         {
             _data[i] = other._data[i];
@@ -95,7 +96,7 @@ public:
         }
         for (int i = 0; i < _size; i++)
         {
-            if ((*this)[i] != other[i])
+            if (std::abs((*this)[i] - other[i]) > epsilon)
             {
                 return false;
             }
@@ -171,23 +172,25 @@ public:
         return result;
     }
 
-    T evaluate(U x) const // вычисление значения многочлена при указанном значении х
+    T evaluate(U x) const
     {
         T result = 0;
+        T power = 1;
         for (int i = 0; i < _size; i++)
         {
-            result += (*this)[i] * std::pow(x, i);
+            result += (*this)[i] * power;
+            power *= x;
         }
         return result;
     }
 
-    void shrink_to_fit() // удаление нулей в конце
+    void shrink_to_fit()
     {
         while (_size > 1 && _data[_size - 1] == 0)
         {
             _size--;
         }
-        T *new_data = new T[_size];
+        T *new_data = new T[static_cast<std::size_t>(_size)];
         for (int i = 0; i < _size; i++)
         {
             new_data[i] = _data[i];
@@ -209,7 +212,7 @@ public:
         }
 
         _size = degree + 1;
-        T *new_data = new T[_size]{};
+        T *new_data = new T[static_cast<std::size_t>(_size)]{};
         for (int i = 0; i < old_size; i++)
         {
             new_data[i] = _data[i];
@@ -254,4 +257,57 @@ export template <typename T, typename U>
 Polynomial<T, U> operator*(U scalar, const Polynomial<T, U> &polynomial)
 {
     return polynomial * scalar;
+}
+
+export template <typename T>
+T random_value()
+{
+    static std::mt19937 generator(std::random_device{}());
+    std::uniform_real_distribution<double> distribution(-10.0, 10.0);
+
+    return static_cast<T>(distribution(generator));
+}
+
+export template <>
+int random_value<int>()
+{
+    static std::mt19937 generator(std::random_device{}());
+    std::uniform_int_distribution<int> distribution(-10, 10);
+
+    return distribution(generator);
+}
+
+export template <>
+std::complex<float> random_value<std::complex<float>>()
+{
+    static std::mt19937 generator(std::random_device{}());
+    std::uniform_real_distribution<float> distribution(-10.0f, 10.0f);
+
+    float real = distribution(generator);
+    float imaginary = distribution(generator);
+
+    return std::complex<float>(real, imaginary);
+}
+
+export template <>
+std::complex<double> random_value<std::complex<double>>()
+{
+    static std::mt19937 generator(std::random_device{}());
+    std::uniform_real_distribution<double> distribution(-10.0, 10.0);
+
+    double real = distribution(generator);
+    double imaginary = distribution(generator);
+
+    return std::complex<double>(real, imaginary);
+}
+
+export template <typename T, typename U>
+Polynomial<T, U> random_polynomial(int degree)
+{
+    Polynomial<T, U> result(degree);
+    for (int i = 0; i <= degree; i++)
+    {
+        result.set(i, random_value<T>());
+    }
+    return result;
 }

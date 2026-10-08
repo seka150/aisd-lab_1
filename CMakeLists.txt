@@ -16,8 +16,8 @@ set(CMAKE_OSX_SYSROOT
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
    CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
-    set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} -Wall -Weffc++ -Wextra -Wpedantic")
+set(CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS} -Wall -Wconversion -Wextra -Wpedantic")
 
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
