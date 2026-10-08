@@ -10,7 +10,29 @@ private:
     int _size;
 
 public:
-    Polynomial(int degree) : _data(new T[degree + 1]{}), _size(degree + 1) {}
+    Polynomial(int degree)
+    {
+        if (degree < 0)
+        {
+            throw std::invalid_argument("Degree cannot be negative");
+        }
+        _size = degree + 1;
+        _data = new T[_size]{};
+    }
+
+    Polynomial(const T *coeff, int size)
+    {
+        if (size <= 0)
+        {
+            throw std::out_of_range("size <= 0");
+        }
+        _size = size;
+        _data = new T[size];
+        for (int i = 0; i < size; i++)
+        {
+            _data[i] = coeff[i];
+        }
+    }
 
     ~Polynomial()
     {
@@ -23,6 +45,16 @@ public:
         {
             _data[i] = other._data[i];
         }
+    }
+
+    int getSize() const
+    {
+        return _size;
+    }
+
+    T getData(int degree) const
+    {
+        return (*this)[degree];
     }
 
     Polynomial &operator=(const Polynomial &other)
@@ -41,27 +73,11 @@ public:
         return *this;
     }
 
-    std::pair<U, U> local_extremum() const
-    {
-        if (_size < 3)
-        {
-            throw std::out_of_range("Polynomial must have at least 3 coefficients");
-        }
-        if (_data[2] == 0)
-        {
-            throw std::invalid_argument("Polynomial must be quadratic");
-        }
-
-        U x = -static_cast<U>(_data[1]) / (2 * static_cast<U>(_data[2]));
-        U y = static_cast<U>(_data[2]) * x * x + static_cast<U>(_data[1]) * x + static_cast<U>(_data[0]);
-        return std::make_pair(x, y);
-    }
-
     T operator[](int degree) const
     {
         if (degree < 0)
         {
-            return 0;
+            throw std::out_of_range("Degree cannot be negative");
         }
         if (degree >= _size)
         {
@@ -71,19 +87,35 @@ public:
         return _data[degree];
     }
 
+    bool operator==(const Polynomial &other) const
+    {
+        if (_size != other._size)
+        {
+            return false;
+        }
+        for (int i = 0; i < _size; i++)
+        {
+            if ((*this)[i] != other[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator!=(const Polynomial &other) const
+    {
+        return !(*this == other);
+    }
+
     void set(int degree, T value)
     {
-        if (degree >= _size)
+        if (degree < 0)
         {
-            T *new_data = new T[degree + 1]{};
-            for (int i = 0; i < _size; i++)
-            {
-                new_data[i] = _data[i];
-            }
-            delete[] _data;
-            _data = new_data;
-            _size = degree + 1;
+            throw std::out_of_range("Degree cannot be negative");
         }
+
+        expand(degree);
         _data[degree] = value;
     }
 
@@ -166,16 +198,17 @@ public:
 
     void expand(int degree)
     {
+        if (degree < 0)
+        {
+            throw std::out_of_range("Degree cannot be negative");
+        }
         int old_size = _size;
         if (degree + 1 <= old_size)
         {
             return;
         }
 
-        if (old_size < degree + 1)
-        {
-            _size = degree + 1;
-        }
+        _size = degree + 1;
         T *new_data = new T[_size]{};
         for (int i = 0; i < old_size; i++)
         {
@@ -185,6 +218,37 @@ public:
         _data = new_data;
     }
 };
+
+export template <typename T, typename U>
+std::ostream &operator<<(std::ostream &out, const Polynomial<T, U> &polynomial)
+{
+    for (int i = 0; i < polynomial.getSize(); i++)
+    {
+        out << polynomial[i];
+        if (i < polynomial.getSize() - 1)
+        {
+            out << " ";
+        }
+    }
+    return out;
+}
+
+export template <typename T, typename U>
+std::pair<U, U> local_extremum(const Polynomial<T, U> &polynomial)
+{
+    if (polynomial.getSize() < 3)
+    {
+        throw std::out_of_range("Polynomial must have at least 3 coefficients");
+    }
+    if (polynomial.getData(2) == 0)
+    {
+        throw std::invalid_argument("Polynomial must be quadratic");
+    }
+
+    U x = -static_cast<U>(polynomial.getData(1)) / (2 * static_cast<U>(polynomial.getData(2)));
+    U y = static_cast<U>(polynomial.getData(2)) * x * x + static_cast<U>(polynomial.getData(1)) * x + static_cast<U>(polynomial.getData(0));
+    return std::make_pair(x, y);
+}
 
 export template <typename T, typename U>
 Polynomial<T, U> operator*(U scalar, const Polynomial<T, U> &polynomial)

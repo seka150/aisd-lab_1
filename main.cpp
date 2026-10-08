@@ -3,140 +3,127 @@ import polynomial_class;
 
 int main()
 {
-    Polynomial<double, double> polynomial(2);
+    // Constructor from coefficient array
+    double coefficients[] = {3.0, 4.0, 2.0};
+    Polynomial<double, double> p(coefficients, 3);
 
-    polynomial.set(0, 3);
-    polynomial.set(1, 4);
-    polynomial.set(2, 2);
+    std::cout << "Polynomial p: " << p << '\n';
 
-    std::println("Polynomial:");
-    for (int i = 0; i <= 2; i++)
-    {
-        std::println("p[{}] = {}", i, polynomial[i]);
-    }
+    // operator[]
+    std::cout << "p[0] = " << p[0] << '\n';
+    std::cout << "p[1] = " << p[1] << '\n';
+    std::cout << "p[2] = " << p[2] << '\n';
+    std::cout << "p[5] = " << p[5] << '\n';
 
-    std::println("\nAccess outside the polynomial:");
-    std::println("p[10] = {}", polynomial[10]);
-    std::println("p[-1] = {}", polynomial[-1]);
+    // set
+    p.set(3, 5.0);
+    std::cout << "\nAfter set(3, 5.0): " << p << '\n';
 
-    auto [x, y] = polynomial.local_extremum();
+    // expand
+    p.expand(5);
+    std::cout << "After expand(5): " << p << '\n';
 
-    std::println("\nLocal extremum: x = {}, y = {}", x, y);
+    // Second polynomial
+    double coefficients2[] = {1.0, 2.0, 3.0};
+    Polynomial<double, double> q(coefficients2, 3);
 
-    Polynomial<double, double> copy = polynomial;
-    copy.set(0, 100);
+    std::cout << "\nPolynomial q: " << q << '\n';
 
-    std::println("\nCopy constructor:");
+    // Addition
+    Polynomial<double, double> sum = p + q;
+    std::cout << "p + q = " << sum << '\n';
 
-    std::println("polynomial[0] = {}", polynomial[0]);
-    std::println("copy[0] = {}", copy[0]);
+    // Subtraction
+    Polynomial<double, double> difference = p - q;
+    std::cout << "p - q = " << difference << '\n';
 
-    std::println("\nCopy assignment:");
+    // Scalar multiplication
+    Polynomial<double, double> multiplied1 = p * 2.0;
+    Polynomial<double, double> multiplied2 = 2.0 * p;
 
-    Polynomial<double, double> assigned(2);
-    assigned = polynomial;
-    assigned.set(0, 200);
+    std::cout << "p * 2 = " << multiplied1 << '\n';
+    std::cout << "2 * p = " << multiplied2 << '\n';
 
-    std::println("polynomial[0] = {}", polynomial[0]);
-    std::println("assigned[0] = {}", assigned[0]);
+    // Evaluation
+    double x = 2.0;
+    std::cout << "p(" << x << ") = " << p.evaluate(x) << '\n';
 
-    Polynomial<std::complex<double>, double> complexPolynomial(3);
+    // Copy constructor
+    Polynomial<double, double> copy = p;
+    std::cout << "\nCopy of p: " << copy << '\n';
 
-    complexPolynomial.set(0, {4, 3});
-    complexPolynomial.set(1, {5, 3});
-    complexPolynomial.set(2, {7, 3});
-    complexPolynomial.set(3, {8, 3});
+    // Assignment operator
+    Polynomial<double, double> assigned(0);
+    assigned = p;
+    std::cout << "Assigned polynomial: " << assigned << '\n';
 
-    std::println("\nComplex polynomial:");
+    // Comparison
+    std::cout << "p == copy: " << (p == copy) << '\n';
+    std::cout << "p != q: " << (p != q) << '\n';
 
-    for (int i = 0; i < 4; i++)
-    {
-        std::println(
-            "p[{}] = {} + {}i",
-            i,
-            complexPolynomial[i].real(),
-            complexPolynomial[i].imag());
-    }
+    // Shrink
+    p.shrink_to_fit();
+    std::cout << "After shrink_to_fit: " << p << '\n';
+    std::cout << "Size: " << p.getSize() << '\n';
 
-    auto multipliedComplex = complexPolynomial * 2.0;
+    // Local extremum
+    double quadratic_coefficients[] = {3.0, 4.0, 2.0};
+    Polynomial<double, double> quadratic(quadratic_coefficients, 3);
 
-    std::println("\nComplex polynomial multiplied by 2:");
+    auto extremum = local_extremum(quadratic);
 
-    for (int i = 0; i < 4; i++)
-    {
-        std::println(
-            "p[{}] = {} + {}i",
-            i,
-            multipliedComplex[i].real(),
-            multipliedComplex[i].imag());
-    }
+    std::cout << "\nQuadratic polynomial: " << quadratic << '\n';
+    std::cout << "Local extremum: ("
+              << extremum.first << ", "
+              << extremum.second << ")\n";
 
-    polynomial.set(5, 10);
-    polynomial.set(5, 0);
-    polynomial.shrink_to_fit();
+    // int
+    int int_coefficients[] = {1, 2, 3};
+    Polynomial<int, int> int_polynomial(int_coefficients, 3);
 
-    std::println("\nAfter shrink_to_fit:");
+    std::cout << "\nint polynomial: " << int_polynomial << '\n';
+    std::cout << "int polynomial at 2: "
+              << int_polynomial.evaluate(2) << '\n';
 
-    std::println("p[3] = {}", polynomial[3]);
-    std::println("p[4] = {}", polynomial[4]);
-    std::println("p[5] = {}", polynomial[5]);
+    // float
+    float float_coefficients[] = {1.0f, 2.0f, 3.0f};
+    Polynomial<float, float> float_polynomial(float_coefficients, 3);
 
-    polynomial.expand(5);
+    std::cout << "\nfloat polynomial: " << float_polynomial << '\n';
+    std::cout << "float polynomial at 2.0: "
+              << float_polynomial.evaluate(2.0f) << '\n';
 
-    std::println("\nAfter expand: ");
+    // double
+    double double_coefficients[] = {1.0, 2.0, 3.0};
+    Polynomial<double, double> double_polynomial(double_coefficients, 3);
 
-    for (int i = 0; i <= 5; i++)
-    {
-        std::println("p[{}] = {}", i, polynomial[i]);
-    }
+    std::cout << "\ndouble polynomial: " << double_polynomial << '\n';
+    std::cout << "double polynomial at 2.0: "
+              << double_polynomial.evaluate(2.0) << '\n';
 
-    polynomial.set(5, 10);
-    std::println("p[5] = {}", polynomial[5]);
+    // complex<float>
+    std::complex<float> complex_float_coefficients[] = {
+        {1.0f, 2.0f},
+        {3.0f, 4.0f},
+        {5.0f, 6.0f}};
 
-    Polynomial<double, double> other(2);
-    other.set(0, 1);
-    other.set(1, 2);
-    other.set(2, 3);
+    Polynomial<std::complex<float>, std::complex<float>>
+        complex_float_polynomial(complex_float_coefficients, 3);
 
-    auto sum = polynomial + other;
-    auto difference = polynomial - other;
+    std::cout << "\ncomplex<float> polynomial: "
+              << complex_float_polynomial << '\n';
 
-    std::println("\nAddition: ");
+    // complex<double>
+    std::complex<double> complex_double_coefficients[] = {
+        {1.0, 2.0},
+        {3.0, 4.0},
+        {5.0, 6.0}};
 
-    for (int i = 0; i <= 5; i++)
-    {
-        std::println("sum[{}] = {}", i, sum[i]);
-    }
+    Polynomial<std::complex<double>, std::complex<double>>
+        complex_double_polynomial(complex_double_coefficients, 3);
 
-    std::println("\nSubtraction:");
-
-    for (int i = 0; i <= 5; i++)
-    {
-        std::println("difference[{}] = {}", i, difference[i]);
-    }
-
-    double xValue = 2.0;
-    double result = polynomial.evaluate(xValue);
-
-    std::println("\nPolynomial evaluation: ");
-    std::println("p({}) = {}", xValue, result);
-
-    auto right = polynomial * 2.0;
-    auto left = 2.0 * polynomial;
-
-    std::println("\nScalar multiplication: ");
-
-    std::println("p * 2: ");
-    for (int i = 0; i <= 5; i++)
-    {
-        std::println("p[{}] = {}", i, right[i]);
-    }
-    std::println();
-    std::println("2 * p: ");
-    for (int i = 0; i <= 5; i++)
-    {
-        std::println("p[{}] = {}", i, left[i]);
-    }
+    std::cout << "\ncomplex<double> polynomial: "
+              << complex_double_polynomial << '\n';
 
     return 0;
 }
